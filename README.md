@@ -1,6 +1,6 @@
 # Download Die küchenschlacht
 
-BASH script to download (by default) todays episdoe of Die küchenschlacht from ZDF Mediathek.
+BASH script to download (by default) todays episode of Die küchenschlacht from ZDF Mediathek.
 
 Requires `wget` and `ffmpeg`.
 
