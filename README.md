@@ -5,12 +5,15 @@ BASH script to download (by default) todays episode of Die küchenschlacht from 
 Requires `wget` and `ffmpeg`.
 
 ```bash
+$ date +'%y%m%d'
+190628
+
 $ ./kuechenschlacht.sh -h
 usage: ./kuechenschlacht.sh [DD] [MM] [YY] [QUALITY]
 
 Defaults to todays date and 3296000:
 
-Default: ./kuechenschlacht.sh 30 06 19 3296000
+Default: ./kuechenschlacht.sh 28 06 19 3296000
 
 Quality options:
 476000  : BANDWIDTH=388000,RESOLUTION=480x272,CODECS='avc1.77.30, mp4a.40.2'
