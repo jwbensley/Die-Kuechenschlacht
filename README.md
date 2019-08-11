@@ -2,7 +2,7 @@
 
 BASH script to download (by default) todays episode of Die küchenschlacht from ZDF Mediathek.
 
-Requires `wget` and `ffmpeg`.
+Requires `wget` or `curl` and `ffmpeg` (NOT `avconv`!).
 
 ```bash
 $ date +'%y%m%d'
