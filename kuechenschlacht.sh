@@ -1,7 +1,6 @@
 #!/bin/bash
 
 
-
 # Ensure required bins are present
 which wget > /dev/null
 if [ $? -eq 0 ]
@@ -33,7 +32,6 @@ else
         exit 1
     fi
 fi
-
 
 
 # Parse CLI args and display help test:
@@ -90,7 +88,7 @@ cd "$d"
 
 
 # Download the daily playlist file which contains URLs to all the individual
-# chunks which make the episode:
+# segments which make the episode:
 playlist_url="https://zdfvodnone-vh.akamaihd.net/i/meta-files/zdf/smil/m3u8/"
 playlist_url+="300/$year_2/"
 playlist_url+="$month_2/"
@@ -124,14 +122,16 @@ part_count=`grep -v "#" "$playlist_filename" | wc -l`
 
 
 
-# Download all the chunks in the playlist
+# Download all the segments in the playlist
 if [ $use_wget -eq 1 ]
 then
+    echo -e "\nUsing wget:"
     # Use -N with wget to only download files if they don't already exist (i.e. a poor-man's resume)
-    for url in `grep -v "#" "$playlist_filename"`; do  wget -nv --show-progress -N "$url" && echo "Chunk: `ls *.ts | wc -l`/$part_count"; done
+    for url in `grep -v "#" "$playlist_filename"`; do  wget -nv --show-progress -N "$url"; echo -e "Segment: `ls *.ts | wc -l`/$part_count\n\n"; done
 else
+    echo -e "\nUsing curl:"
     # curl doesn't have any sort of no-clobber option like wget
-    for url in `grep -v "#" "$playlist_filename"`; do  curl -O "$url" && echo "Chunk: `ls *.ts | wc -l`/$part_count"; done
+    for url in `grep -v "#" "$playlist_filename"`; do  curl -O "$url"; echo -e "Segment: `ls *.ts | wc -l`/$part_count\n\n"; done
 fi
 
 if (( `ls *.ts | wc -l` != "$part_count" ))
@@ -142,10 +142,57 @@ fi
 
 
 
-# Merge all the chunks into a single video file
-ffmpeg -y -i "concat:`ls -1 *.ts | sort -V | tr '\n' '|' | head --bytes -1`" -c copy -bsf:a aac_adtstoasc "$date_6".mp4
-if [ $? -eq 0 ]
+# Merge all the segments into a single video file.
+# If there are more than 100 segments, merge them in to 100-segment files and
+# then merge those 100-segment files. This is to prevent open file limits from
+# being reached.
+if [ $part_count -gt 100 ]
 then
-    rm ./*.ts
+
+    # Merge 100 segments at a time
+    for i in `seq 0 $((($part_count/100)-1))`
+    do
+        seg_list=`ls -1 segment*.ts | sort -V | head -n $((100+(100*$i))) | tail -n 100 | tr '\n' '|' | rev | cut -c 2- | rev`
+        ffmpeg -y -i "concat:$seg_list" -c copy -bsf:a aac_adtstoasc "$i".mp4
+    done
+
+    # Merge whatever is left
+    let i=i+1
+    diff=$(($part_count-(i*100)))
+    seg_list=`ls -1 segment*.ts | sort -V | tail -n $diff | tr '\n' '|' | rev | cut -c 2- | rev`
+    ffmpeg -y -i "concat:$seg_list" -c copy -bsf:a aac_adtstoasc "$i".mp4
+
+    # Merge the 100-segment chunks.
+    # Can't use "concat:" method for mp4 files with ffmpeg.
+    for f in `ls *.mp4`; do echo "file $f"; done | ffmpeg -protocol_whitelist file,pipe -f concat -i - -c copy "$date_6".mp4
+    if [ $? -eq 0 ]
+    then
+        for j in `seq 0 $i`
+        do
+            rm "./$j.mp4"
+        done
+        rm ./*.ts
+        rm ./*.m3u8
+
+    fi
+
+else
+    # On Linux we can use the following to get all the segment file names seperated by a vertical pipes:
+    # ls -1 *.ts | sort -V | tr '\n' '|' | head --bytes -1
+    #
+    # On Mac the bytes option for 'head' uses a different argument, -c, and it doesn't support minus values.
+    # The following filth works on Mac and Linux
+    # ls -1 *.ts | sort -V | tr '\n' '|' | rev | cut -c 2- | rev
+    #
+    # This is to avoid an...
+    # if [ $(uname) == "Darwin" ]; then ...
+    seg_list=`ls -1 *.ts | sort -V | tr '\n' '|' | rev | cut -c 2- | rev`
+    ffmpeg -y -i "concat:$seg_list" -c copy -bsf:a aac_adtstoasc "$date_6".mp4
+    if [ $? -eq 0 ]
+    then
+        rm ./*.ts
+    fi
 fi
+
 sync
+echo "Finished"
