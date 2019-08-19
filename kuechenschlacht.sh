@@ -35,11 +35,12 @@ fi
 
 
 # Parse CLI args and display help test:
-if [ "$1" = "-h" ]
+args=("$@")
+if [[ " ${args[@]} " =~ "-h" ]]
 then
     echo "usage: $0 [DD] [MM] [YY] [QUALITY]"
     echo ""
-    echo "Defaults to todays date and 3296000:"
+    echo "Defaults to todays date and maximum quality (3296000):"
     echo ""
     echo "Default: $0 `date +'%d'` `date +'%m'` `date +'%y'` 3296000"
     echo ""
@@ -97,6 +98,8 @@ playlist_url+="_sendung_dku/1/$date_6"
 playlist_url+="_sendung_dku.smil/index_$quality"
 playlist_url+="_av.m3u8"
 playlist_filename=`basename "$playlist_url"`
+
+#playlist_url="https://zdfvodnone-vh.akamaihd.net/i/meta-files/zdf/smil/m3u8/300/19/08/190815_sendung_dku/2/190815_sendung_dku.smil/index_476000_av.m3u8"
 
 echo "Downloading Die Küchenschlacht episode for $date_6:"
 # wget will return a non-zero exist status if the playlist URL is invalid,
