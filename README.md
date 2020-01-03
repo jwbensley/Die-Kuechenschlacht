@@ -1,24 +1,32 @@
-# Download Die küchenschlacht
+# Download Die Küchenschlacht
 
-BASH script to download (by default) todays episode of Die küchenschlacht from ZDF Mediathek.
+BASH script to download (by default) todays episode of Die Küchenschlacht from ZDF Mediathek.
 
 Requires `wget` or `curl` and `ffmpeg` (NOT `avconv`!).
 
 ```bash
-$ date +'%y%m%d'
-190628
+$ date +'%d%m%y'
+030120
 
 $ ./kuechenschlacht.sh -h
 usage: ./kuechenschlacht.sh [DD] [MM] [YY] [QUALITY]
 
-Defaults to todays date and 3296000:
+Defaults to todays date and maximum quality (3328000):
 
-Default: ./kuechenschlacht.sh 28 06 19 3296000
+Default: ./kuechenschlacht.sh 03 01 20 3328000
 
 Quality options:
 476000  : BANDWIDTH=388000,RESOLUTION=480x272,CODECS='avc1.77.30, mp4a.40.2'
+508000  : BANDWIDTH=424000,RESOLUTION=480x270,CODECS='avc1.77.30, mp4a.40.2'
 776000  : BANDWIDTH=623000,RESOLUTION=640x360,CODECS='avc1.77.30, mp4a.40.2'
+808000  : BANDWIDTH=665000,RESOLUTION=640x360,CODECS='avc1.77.30, mp4a.40.2'
 1496000 : BANDWIDTH=1193000,RESOLUTION=852x480,CODECS='avc1.77.30, mp4a.40.2'
+1628000 : BANDWIDTH=1314000,RESOLUTION=960x540,CODECS='avc1.77.30, mp4a.40.2'
 2296000 : BANDWIDTH=1830000,RESOLUTION=1024x576,CODECS='avc1.77.30, mp4a.40.2'
 3296000 : BANDWIDTH=2583000,RESOLUTION=1280x720,CODECS='avc1.640028, mp4a.40.2'
+3328000 : BANDWIDTH=2652000,RESOLUTION=1280x720,CODECS='avc1.640028, mp4a.40.2'
+
+Note: Not all episodes are available at every quality
 ```
+
+If the script is interrupted whilst downloading the segments of an episode, `wget` will resume from the most resent segment, `curl` will re-download all existing segments.

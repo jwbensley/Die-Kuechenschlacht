@@ -56,7 +56,7 @@ then
     echo "3296000 : BANDWIDTH=2583000,RESOLUTION=1280x720,CODECS='avc1.640028, mp4a.40.2'"
     echo "3328000 : BANDWIDTH=2652000,RESOLUTION=1280x720,CODECS='avc1.640028, mp4a.40.2'"
     echo ""
-    echo "Note: Not all episodes are available every qualities"
+    echo "Note: Not all episodes are available at every quality"
     echo ""
     exit 1
 fi
