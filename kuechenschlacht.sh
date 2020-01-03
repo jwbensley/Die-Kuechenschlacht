@@ -111,12 +111,17 @@ echo "Downloading Die Küchenschlacht episode for $date_6:"
 # wget will return a non-zero exist status if the playlist URL is invalid,
 # curl will return 0. In the case of curl, an error message is returned by the
 # remote server, check for the presence of the error message in the output file:
+if [ -f $playlist_filename ]
+then
+    rm -f "./$playlist_filename"
+fi
 if [ $use_wget -eq 1 ]
 then
     wget -nv "$playlist_url"
     if [ $? -ne 0 ]
     then
         echo "Playlist download failed. Exiting."
+        echo "Hint: Try another quality setting, each episode is not not available in all qualities."
         exit 1
     fi
 else
@@ -124,6 +129,7 @@ else
     if [ `grep -c "error occurred" "$playlist_filename"` -eq 1 ]
     then
         echo "Playlist download failed. Exiting."
+        echo "Hint: Try another quality setting, each episode is not not available in all qualities."
         exit 1
     fi 
 fi
@@ -160,7 +166,7 @@ else
     done
 fi
 
-if (( `ls *.ts | wc -l` != "$part_count" ))
+if [ `ls *.ts | wc -l` -ne "$part_count" ]
 then
     echo "Some parts are missing from the download. Exiting."
     exit 1
@@ -189,8 +195,16 @@ then
     ffmpeg -y -i "concat:$seg_list" -c copy -bsf:a aac_adtstoasc "$i".mp4
 
     # Merge the 100-segment chunks.
-    # Can't use "concat:" method for mp4 files with ffmpeg.
-    for f in `ls *.mp4`; do echo "file $f"; done | ffmpeg -protocol_whitelist file,pipe -f concat -i - -c copy "$date_6".mp4
+    # We can't use "concat:" method for mp4 files with ffmpeg.
+    #
+    # Also the following method doesnt work on all ffmpeg vesions,
+    # they don't all have the -protocol_whitelist option:
+    # for f in `ls *.mp4`; do echo "file $f"; done | ffmpeg -protocol_whitelist file,pipe -f concat -i - -c copy "$date_6".mp4
+    #
+    # Instead write a list of mp4 to a file and feed that to ffmpeg,
+    # this seems to be supported by most/all versions:
+    for f in `ls *.mp4`; do echo "file $f" >> $$.tmp; done
+    ffmpeg -f concat -i $$.tmp -c copy "$date_6".mp4
     if [ $? -eq 0 ]
     then
         for j in `seq 0 $i`
@@ -199,24 +213,26 @@ then
         done
         rm ./*.ts
         rm ./*.m3u8
-
+        rm ./$$.tmp
     fi
 
 else
-    # On Linux we can use the following to get all the segment file names seperated by a vertical pipes:
+    # On Linux we can use the following one-liner to get all the segment 
+    # filenames, each seperated by a vertical pipe:
     # ls -1 *.ts | sort -V | tr '\n' '|' | head --bytes -1
     #
-    # On Mac the bytes option for 'head' uses a different argument, -c, and it doesn't support minus values.
-    # The following filth works on Mac and Linux
+    # On Mac the bytes option for 'head' uses a different argument,
+    # -c, and it doesn't support minus values.
+    # The following filth works on Mac and Linux:
     # ls -1 *.ts | sort -V | tr '\n' '|' | rev | cut -c 2- | rev
     #
-    # This is to avoid an...
-    # if [ $(uname) == "Darwin" ]; then ...
+    # The following works on both and avoids an: if [ $(uname) == "Darwin" ]; then ...
     seg_list=`ls -1 *.ts | sort -V | tr '\n' '|' | rev | cut -c 2- | rev`
     ffmpeg -y -i "concat:$seg_list" -c copy -bsf:a aac_adtstoasc "$date_6".mp4
     if [ $? -eq 0 ]
     then
         rm ./*.ts
+        rm ./*.m3u8
     fi
 fi
 
