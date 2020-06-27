@@ -28,6 +28,38 @@ function dl_single() {
 }
 
 
+# Parse CLI args and display help test:
+args=("$@")
+if [[ " ${args[@]} " =~ "-h" ]]
+then
+    echo "usage: $0 [DD] [MM] [YY] [QUALITY]"
+    echo ""
+    echo "Defaults to todays date and maximum quality (2128):"
+    echo ""
+    echo "Default: $0 `date +'%d'` `date +'%m'` `date +'%y'` 2128"
+    echo ""
+    echo "Quality options (for whole episodes):"
+    echo "368     : NAME=Hoch,BANDWIDTH=368kbps,RESOLUTION=480x270,CODEC=Google/On2 VP9"
+    echo "1128    : NAME=Sehr Hoch,BANDWIDTH=1128Kbps,RESOLUTION=960x540,CODEC=Google/On2 VP9"
+    echo "2128    : NAME=HD,BANDWIDTH=2129Kbps,RESOLUTION=1280x720,CODEC=Google/On2 VP9"
+    echo ""
+    echo "Quality options (for chunked episodes):"
+    echo "476000  : BANDWIDTH=388000,RESOLUTION=480x272,CODECS='avc1.77.30, mp4a.40.2'"
+    echo "508000  : BANDWIDTH=424000,RESOLUTION=480x270,CODECS='avc1.77.30, mp4a.40.2'"
+    echo "776000  : BANDWIDTH=623000,RESOLUTION=640x360,CODECS='avc1.77.30, mp4a.40.2'"
+    echo "808000  : BANDWIDTH=665000,RESOLUTION=640x360,CODECS='avc1.77.30, mp4a.40.2'"
+    echo "1496000 : BANDWIDTH=1193000,RESOLUTION=852x480,CODECS='avc1.77.30, mp4a.40.2'"
+    echo "1628000 : BANDWIDTH=1314000,RESOLUTION=960x540,CODECS='avc1.77.30, mp4a.40.2'"
+    echo "2296000 : BANDWIDTH=1830000,RESOLUTION=1024x576,CODECS='avc1.77.30, mp4a.40.2'"
+    echo "3296000 : BANDWIDTH=2583000,RESOLUTION=1280x720,CODECS='avc1.640028, mp4a.40.2'"
+    echo "3328000 : BANDWIDTH=2652000,RESOLUTION=1280x720,CODECS='avc1.640028, mp4a.40.2'"
+    echo ""
+    echo "Note: Not all episodes are available at every quality"
+    echo ""
+    exit 1
+fi
+
+
 # Ensure required bins are present
 which wget > /dev/null
 if [ $? -eq 0 ]
@@ -45,38 +77,6 @@ else
         echo "wget or curl required but missing. Exiting"
         exit 1
     fi
-fi
-
-
-# Parse CLI args and display help test:
-args=("$@")
-if [[ " ${args[@]} " =~ "-h" ]]
-then
-    echo "usage: $0 [DD] [MM] [YY] [QUALITY]"
-    echo ""
-    echo "Defaults to todays date and maximum quality (2128):"
-    echo ""
-    echo "Default: $0 `date +'%d'` `date +'%m'` `date +'%y'` 2128"
-    echo ""
-    echo "Quality options (for whole episodes):"
-    echo "368     : NAME=Hoch,BANDWIDTH=368kbps,RESOLUTION=480x270,CODEC=Google/On2 VP9"
-    echo "1128    : NAME=Sehr Hoch,BANDWIDTH=1128Kbps,RESOLUTION=960x540,CODEC=Google/On2 VP9"
-    echo "2128    : Name=HD,BANDWIDTH=2129Kbps,RESOLUTION=1280x720,CODEC=Google/On2 VP9"
-    echo ""
-    echo "Quality options (for chunked episodes):"
-    echo "476000  : BANDWIDTH=388000,RESOLUTION=480x272,CODECS='avc1.77.30, mp4a.40.2'"
-    echo "508000  : BANDWIDTH=424000,RESOLUTION=480x270,CODECS='avc1.77.30, mp4a.40.2'"
-    echo "776000  : BANDWIDTH=623000,RESOLUTION=640x360,CODECS='avc1.77.30, mp4a.40.2'"
-    echo "808000  : BANDWIDTH=665000,RESOLUTION=640x360,CODECS='avc1.77.30, mp4a.40.2'"
-    echo "1496000 : BANDWIDTH=1193000,RESOLUTION=852x480,CODECS='avc1.77.30, mp4a.40.2'"
-    echo "1628000 : BANDWIDTH=1314000,RESOLUTION=960x540,CODECS='avc1.77.30, mp4a.40.2'"
-    echo "2296000 : BANDWIDTH=1830000,RESOLUTION=1024x576,CODECS='avc1.77.30, mp4a.40.2'"
-    echo "3296000 : BANDWIDTH=2583000,RESOLUTION=1280x720,CODECS='avc1.640028, mp4a.40.2'"
-    echo "3328000 : BANDWIDTH=2652000,RESOLUTION=1280x720,CODECS='avc1.640028, mp4a.40.2'"
-    echo ""
-    echo "Note: Not all episodes are available at every quality"
-    echo ""
-    exit 1
 fi
 
 
