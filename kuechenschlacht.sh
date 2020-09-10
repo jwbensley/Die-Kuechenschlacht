@@ -142,7 +142,7 @@ multi_filename="$date_6.mp4"
 # Check if the episdoe file already exists as the single file format
 if [ -f "./$single_filename" ]
 then
-    if [ $clobber -eq 0 ]; then echo "File already exists"; return 1; fi
+    if [ $clobber -eq 0 ]; then echo "File already exists"; exit 1; fi
 else
     rm -f "./$single_filename"
 fi
@@ -162,13 +162,11 @@ then
     # be used either.
     wget -c "$ep_url"
     ret="$?"
-    #if [ $ret -ne 0 ]; then return 1; fi
 else
     echo -e "\nUsing curl"
     # -C -   resume
     curl -C - -O "$ep_url"
     ret="$?"
-    #if [ $? -ne 0 ]; then return 1; fi
 fi
 
 if [ $ret -eq 0 ]
@@ -229,7 +227,7 @@ part_count=`grep -v "#" "$playlist_filename" | wc -l`
 # already exists:
 if [ -f "./$multi_filename" ]
 then
-    if [ $clobber -eq 0 ]; then echo "File already exists"; return 1; fi
+    if [ $clobber -eq 0 ]; then echo "File already exists"; exit 1; fi
 else
     rm -f "./$multi_filename"
 fi
