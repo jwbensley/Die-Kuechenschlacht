@@ -8,6 +8,7 @@ then
     echo "usage: $0 [DD] [MM] [YY] [QUALITY] [-c]"
     echo ""
     echo " -c     : Enabled clobber; overwrite existing episode file."
+    echo " -h     : This help text."
     echo ""
     echo "Defaults to todays date and maximum quality (2128):"
     echo ""
