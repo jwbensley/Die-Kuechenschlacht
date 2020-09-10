@@ -151,7 +151,7 @@ fi
 # then try to download it:
 if [ $use_wget -eq 1 ]
 then
-    echo -e "\nUsing wget:"
+    echo -e "\nUsing wget"
     # wget args:
     # -c, --continue    resume getting a partially-downloaded file.
     # Not all wget versions (i.e. Ubuntu) support --show-progress, so it
@@ -164,7 +164,7 @@ then
     ret="$?"
     #if [ $ret -ne 0 ]; then return 1; fi
 else
-    echo -e "\nUsing curl:"
+    echo -e "\nUsing curl"
     # -C -   resume
     curl -C - -O "$ep_url"
     ret="$?"
