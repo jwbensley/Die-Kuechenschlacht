@@ -122,7 +122,7 @@ ep_url+="_sendung_1415_dku/1/"
 ep_url+="$year_2$month_2"
 ep_url+="$day_2"
 ep_url+="_sendung_1415_dku_$single_qual.webm"
-ep_filename=$(basename "$ep_url")
+single_filename=$(basename "$ep_url")
 
 
 # Also build the URL for the multiple-files-per-episode format.
@@ -140,11 +140,11 @@ multi_filename="$date_6.mp4"
 
 
 # Check if the episdoe file already exists as the single file format
-if [ -f "./$ep_file" ]
+if [ -f "./$single_filename" ]
 then
     if [ $clobber -eq 0 ]; then echo "File already exists"; return 1; fi
 else
-    rm -f "./$ep_file"
+    rm -f "./$single_filename"
 fi
 
 # If it doesn't already exist as the single file format,
