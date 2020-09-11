@@ -66,11 +66,21 @@ year_2="`date +'%y'`"
 quality="2128"
 clobber=0
 
-if [ ! -z "$1" ]; then day_2="$1"; fi
-if [ ! -z "$2" ]; then month_2="$2"; fi
-if [ ! -z "$3" ]; then year_2="$3"; fi
-if [ ! -z "$4" ]; then quality="$4"; fi
-if [[ " ${args[@]} " =~ "-c" ]]; then clobber=1; fi
+declare -a new_args
+for i in "${!args[@]}"; do
+    if [[ ${args[i]} = "-c" ]]; then
+        clobber=1
+        unset 'args[i]'
+    else
+        new_args+=(${args[i]})
+    fi
+done
+args=("${new_args[@]}")
+
+if [ ! -z "${args[0]}" ]; then day_2="${args[0]}"; fi
+if [ ! -z "${args[1]}" ]; then month_2="${args[1]}"; fi
+if [ ! -z "${args[2]}" ]; then year_2="${args[2]}"; fi
+if [ ! -z "${args[3]}" ]; then quality="${args[3]}"; fi
 
 date_6="$year_2"
 date_6+="$month_2"
@@ -140,11 +150,10 @@ multi_filename="$date_6.mp4"
 
 
 # Check if the episdoe file already exists as the single file format
-if [ -f "./$single_filename" ]
+if [ -f "./$single_filename" ] && [ $clobber -eq 0 ]
 then
-    if [ $clobber -eq 0 ]; then echo "File already exists"; exit 1; fi
-else
-    rm -f "./$single_filename"
+    echo "File already exists"
+    exit 1
 fi
 
 # If it doesn't already exist as the single file format,
@@ -225,11 +234,10 @@ part_count=`grep -v "#" "$playlist_filename" | wc -l`
 
 # Once the multi-file playlist is downloaded, check if this episode file
 # already exists:
-if [ -f "./$multi_filename" ]
+if [ -f "./$multi_filename" ] && [ $clobber -eq 0 ]
 then
-    if [ $clobber -eq 0 ]; then echo "File already exists"; exit 1; fi
-else
-    rm -f "./$multi_filename"
+    echo "File already exists"
+    exit 1
 fi
 
 
